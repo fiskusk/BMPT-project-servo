@@ -206,19 +206,19 @@
 #define LCD_DELAY_BOOTUP   16000      /**< delay in micro seconds after power-on  */
 #endif
 #ifndef LCD_DELAY_INIT
-#define LCD_DELAY_INIT      5000      /**< delay in micro seconds after initialization command sent  */
+#define LCD_DELAY_INIT      5100      /**< delay in micro seconds after initialization command sent  */
 #endif
 #ifndef LCD_DELAY_INIT_REP
-#define LCD_DELAY_INIT_REP    64      /**< delay in micro seconds after initialization command repeated */
+#define LCD_DELAY_INIT_REP    80      /**< delay in micro seconds after initialization command repeated */
 #endif
 #ifndef LCD_DELAY_INIT_4BIT
-#define LCD_DELAY_INIT_4BIT   64      /**< delay in micro seconds after setting 4-bit mode */ 
+#define LCD_DELAY_INIT_4BIT   80      /**< delay in micro seconds after setting 4-bit mode */ 
 #endif
 #ifndef LCD_DELAY_BUSY_FLAG
-#define LCD_DELAY_BUSY_FLAG    4      /**< time in micro seconds the address counter is updated after busy flag is cleared */
+#define LCD_DELAY_BUSY_FLAG    8      /**< time in micro seconds the address counter is updated after busy flag is cleared */
 #endif
 #ifndef LCD_DELAY_ENABLE_PULSE
-#define LCD_DELAY_ENABLE_PULSE 1      /**< enable signal pulse width in micro seconds */
+#define LCD_DELAY_ENABLE_PULSE 2      /**< enable signal pulse width in micro seconds */
 #endif
 
 

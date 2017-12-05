@@ -18,7 +18,6 @@
 extern int16_t transfer(uint16_t);
 
 /* global variables */
-uint16_t d = 1500;                    // preset pulse width tON = 1,5 ms
 char buffer[9];                       // buffer for ITOA function
 volatile uint8_t step = 5;            // preset step size
 
@@ -38,7 +37,7 @@ volatile uint8_t step = 5;            // preset step size
 *********************************************************************************/
 void show()
 {
-
+	uint16_t d = OCR1B;
     itoa(d,buffer,10);          // conversion numerical system from d to buffer. Third parameter define desired numerical system.
     lcd_gotoxy(6,0);            // go to line 1 and 0 character
     lcd_puts(buffer);           // and print content of buffer (pulse width)
@@ -87,6 +86,10 @@ void setup()
     PORTD |= 1<<3;                  // activate internal pull-up resistors on bit PD3
     PORTB |= 1<<1;                  // activate internal pull-up resistors on bit PB1
     PORTB |= 1<<3;                  // activate internal pull-up resistors on bit PB3
+	
+	OCR1B = 1500;
+	// set period T = 20 ms, f = 50 Hz. This is define TOP of counter.
+	OCR1A = 20000;
 
     uart_init();
 
@@ -143,22 +146,24 @@ void setup()
     lcd_gotoxy(13,0);
     lcd_puts("St");
     lcd_putc(1);
-
-    // set period T = 20 ms, f = 50 Hz. This is define TOP of counter.
-    OCR1A = 20000;
 }
 
 
+/*********************************************************************************
+*
+* Function Name : main
+* Description    : main function
+*
+*********************************************************************************/
 int main(void)
 {
     setup();                        // system initialization
-    uart_puts("LOOP\n");
+    //uart_puts("LOOP\n");
     while (1)
     {
-        set_duty(d);                // set OCR1B registers bit which define d = tON time PWM waveform
-        show(d);                    // print the pulse width d = tON  on the display
+        show();                    // print the pulse width d = tON  on the display;
     }
-    uart_puts("err146\n");
+    
     return 0;
 }
 
@@ -170,7 +175,9 @@ int main(void)
 *********************************************************************************/
 ISR(INT0_vect)
 {
-    uart_puts("INT0\n");
+    cli();
+	volatile  uint16_t d = OCR1B;
+	//uart_puts("INT0 ");
     /* ternary operation, which fill variable s value = step*either -1, if PINB1 is in HI, or +1, if PINB1 is in LOW */
     int16_t s = step * ((PINB & (1<<1)) ? -1 : 1);
 
@@ -179,6 +186,11 @@ ISR(INT0_vect)
         d += s;                    // routine: fill with new value d+s
     else
         d = (s > 0) ? 2100 : 615;  // else in range from 615 to 2100 set fixed value
+	
+	
+	OCR1B = d;
+	
+	sei();
 }
 
 /*********************************************************************************
@@ -189,35 +201,42 @@ ISR(INT0_vect)
 *********************************************************************************/
 ISR(INT1_vect)
 {
-    static uint8_t status = 0;                // preset status of step size
-    uart_puts("set_step button INT1\n");
+    cli();
+	static uint8_t status = 0;                // preset status of step size
+    //uart_puts("set_step button INT1 ");
     switch(status)
     {
         case 0:
             step = 5;
-            status++;
+            status=1;
             break;
         case 1:
             step = 10;
-            status++;
+            status=2;
             break;
         case 2:
             step = 20;
-            status++;
+            status=3;
             break;
         case 3:
             step = 50;
-            status++;
+            status=4;
             break;
         default:
             step = 100;
             status = 0;
     }
+	sei();
 }
 
 ISR(TIMER1_COMPA_vect)
 {
-    uart_puts("TIMER1 COMPA\n");
+    cli();
+	//uart_puts("TIMER1 COMPA ");
     if (bit_is_clear(PINB,3))
-        d = 1500;
+	{
+		//uart_puts("TIMER1 COMPA ");
+		OCR1B = 1500;
+	}
+	sei();
 }

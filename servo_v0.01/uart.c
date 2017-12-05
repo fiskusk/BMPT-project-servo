@@ -6,7 +6,7 @@
 
 void uart_init(void)
 {
-    UBRR0 = F_CPU/16/9600-1;
+    UBRR0 = 16;
     UCSR0A = 1<<U2X0;                  // double speed mode
     UCSR0B = (1<<RXEN0) | (1<<TXEN0);  // enable receiver and transmitter
     UCSR0C = 3<<UCSZ00;                // 8n1
@@ -21,7 +21,9 @@ void uart_putc(char data)
 
 void uart_puts(char str[])
 {
-    for (int i=0; str[i]; i++)
+    static uint8_t cnt = 0;
+	if (cnt++ == 10) {uart_putc('\n'); cnt=0;};
+	for (int i=0; str[i]; i++)
         uart_putc(str[i]);
 }
 
