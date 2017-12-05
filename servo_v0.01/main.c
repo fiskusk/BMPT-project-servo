@@ -28,7 +28,7 @@ volatile uint8_t step = 5;            // preset step size
 * Description    : set correct OCR1B registers bit, which define pulse width time (tON) PWM waveform
 *
 *********************************************************************************/
-#define set_duty(x) ORC1B = ((uint16_t)(x))
+#define set_duty(x) (OCR1B = (uint16_t)(x))
 
 /*********************************************************************************
 *
@@ -151,8 +151,9 @@ void setup()
 
 int main(void)
 {
+    uart_puts("START\n");
     setup();                        // system initialization
-
+    uart_puts("LOOP\n");
     while (1)
     {
         set_duty(d);                // set OCR1B registers bit which define d = tON time PWM waveform
@@ -170,6 +171,7 @@ int main(void)
 *********************************************************************************/
 ISR(INT0_vect)
 {
+    uart_puts("INT0\n");
     /* ternary operation, which fill variable s value = step*either -1, if PINB1 is in HI, or +1, if PINB1 is in LOW */
     int16_t s = step * ((PINB & (1<<1)) ? -1 : 1);
 
@@ -189,6 +191,7 @@ ISR(INT0_vect)
 ISR(INT1_vect)
 {
     static uint8_t status = 0;                // preset status of step size
+    uart_puts("set_step button INT1\n");
     switch(status)
     {
         case 0:
@@ -215,6 +218,7 @@ ISR(INT1_vect)
 
 ISR(TIMER1_COMPA_vect)
 {
+    uart_puts("TIMER1 COMPA\n");
     if (bit_is_clear(PINB,3))
         d = 1500;
 }
