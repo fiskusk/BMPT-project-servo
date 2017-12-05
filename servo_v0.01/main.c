@@ -7,7 +7,7 @@
 
 /* headliners initialization */
 #define F_CPU 16000000UL            // fCPU 16 MHz
-#define UART_BAUD_RATE  9600
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -88,7 +88,7 @@ void setup()
     PORTB |= 1<<1;                  // activate internal pull-up resistors on bit PB1
     PORTB |= 1<<3;                  // activate internal pull-up resistors on bit PB3
 
-    uart_init(UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU));
+    uart_init();
 
     /* MOD 9 Phase correct */
     TCCR1A = (1<<WGM10) | (1<<COM1B1);
@@ -151,7 +151,6 @@ void setup()
 
 int main(void)
 {
-    uart_puts("START\n");
     setup();                        // system initialization
     uart_puts("LOOP\n");
     while (1)
